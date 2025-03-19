@@ -1,33 +1,45 @@
-import EventList from "@/components/EventList";
+'use client'
 
-export default function Home() {
+import React from 'react';
+import EventForm from '@/components/EventForm';
+import EventList from '@/components/EventList';
+import { useEvents } from '@/hooks/useEvents';
+
+
+const App = () => {
+  const {
+    events,
+    loading,
+    error,
+    handleAddEvent,
+    handleDeleteEvent,
+    handleUpdateEvent,
+  } = useEvents();
+
+  const [editingEvent, setEditingEvent] = React.useState<any>(null);
+
+  const handleEditEvent = (event: any) => {
+    setEditingEvent(event);
+  };
+
+  const handleFormSubmit = (data: any) => {
+    if (editingEvent) {
+      handleUpdateEvent(editingEvent._id, data);
+    } else {
+      handleAddEvent(data);
+    }
+    setEditingEvent(null);
+  };
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>{error}</p>;
+
   return (
     <div>
-      <h1>Calendar</h1>
-      <div>
-        <EventList />
-      </div>
+      <EventForm onSubmit={handleFormSubmit} initialData={editingEvent} />
+      <EventList events={events} onDelete={handleDeleteEvent} onEdit={handleEditEvent} />
     </div>
   );
-}
+};
 
-
-
-// import Auth from "@/components/Auth";
-// // import Calendar from "@/components/Calendar";
-// // import AddEvent from "@/components/AddEvent";
-// import EventList from "@/components/EventList";
-
-// export default function Home() {
-//   // const [token, setToken] = useState<string | null>(null)
-
-//   return (
-//     <div>
-//       <h1>Calendar</h1>
-//       {/* <AddEvent /> */}
-//       <EventList />
-//       {/* {!token ? <Auth setToken={setToken} /> : <Calendar token={token} />} */}
-//     </div>
-//   );
-// }
-
+export default App;
